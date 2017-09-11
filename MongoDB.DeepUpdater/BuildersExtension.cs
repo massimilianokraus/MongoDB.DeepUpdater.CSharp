@@ -7,11 +7,11 @@ namespace MongoDB.DeepUpdater
 {
     public static class BuildersExtension
     {
-        public static UpdateFluent<TDocument, TDocument> Deep<TDocument>(
+        public static FieldFluent<TDocument, TDocument> Deep<TDocument>(
             this UpdateDefinitionBuilder<TDocument> This,
             TDocument document)
         {
-            return new UpdateFluent<TDocument, TDocument>(document);
+            return null; // new BaseSingleUpdateFluent<TDocument, TDocument>(document);
         }
     }
 }
