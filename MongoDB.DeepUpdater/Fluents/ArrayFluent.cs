@@ -1,7 +1,6 @@
 ﻿using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace MongoDB.DeepUpdater
 {
@@ -11,7 +10,7 @@ namespace MongoDB.DeepUpdater
             : base(document)
         { }
 
-        public SingleFluent<TDocument, TField> Where(Func<TField, bool> selector)
+        public FieldFluent<TDocument, TField> Where(Func<TField, bool> selector)
         {
             throw new NotImplementedException();
         }

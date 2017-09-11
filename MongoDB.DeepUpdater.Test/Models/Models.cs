@@ -19,8 +19,11 @@ namespace MongoDB.DeepUpdater.Test.Models
                         Rector = new Person { Name = "Massimiliano Kraus" },
                         Employees = new List<Person>
                         {
+                            new Person { Name = "Al Middlewest" },
                             new Person { Name = "Phil Morris" },
                             new Person { Name = "Bob Marley" },
+                            new Person { Name = "Alicia Boys" },
+                            new Person { Name = "Alan Silvestri" },
                         }
                     },
                     Departments = new List<Department>
@@ -29,9 +32,13 @@ namespace MongoDB.DeepUpdater.Test.Models
                         {
                             Area = "Engineering",
                             MacroArea = "Science",
-                            DegreeCourses = new List<Course>
+                            Courses = new List<Course>
                             {
-                                new Course { Name = "Civil Engineering", CourseYears = new List<CourseYear>() },
+                                new Course
+                                {
+                                    Name = "Civil Engineering",
+                                    CourseYears = new List<CourseYear>()
+                                },
                                 new Course
                                 {
                                     Name = "Marine Engineering",
@@ -92,7 +99,7 @@ namespace MongoDB.DeepUpdater.Test.Models
                         {
                             Area = "Physics",
                             MacroArea = "Science",
-                            DegreeCourses = new List<Course>
+                            Courses = new List<Course>
                             {
                                 new Course
                                 {
@@ -125,13 +132,13 @@ namespace MongoDB.DeepUpdater.Test.Models
                         {
                             Area = "EmptyArea",
                             MacroArea = "Science",
-                            DegreeCourses = new List<Course>(),
+                            Courses = new List<Course>(),
                         },
                         new Department
                         {
                             Area = "Literature",
                             MacroArea = "Humanism",
-                            DegreeCourses = new List<Course>
+                            Courses = new List<Course>
                             {
                                 new Course { Name = "Ancient Literature" },
                                 new Course
@@ -184,7 +191,7 @@ namespace MongoDB.DeepUpdater.Test.Models
     {
         public string Area { get; set; }
         public string MacroArea { get; set; }
-        public List<Course> DegreeCourses { get; set; }
+        public List<Course> Courses { get; set; }
     }
 
     public class Course

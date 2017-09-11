@@ -11,9 +11,19 @@ namespace MongoDB.DeepUpdater
             : base(document)
         { }
 
-        public List<FieldDefinition<TDocument, TField>> GetFieldDefinitions()
+        internal List<FieldDefinition<TDocument, TField>> InternalGetFieldDefinitions()
         {
-            return null;
+            throw new NotImplementedException();
+        }
+
+        public FieldFluent<TDocument, TNestedField> Select<TNestedField>(Expression<Func<TField, TNestedField>> selectorExpression)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ArrayFluent<TDocument, TNestedField> SelectArray<TNestedField>(Expression<Func<TField, IEnumerable<TNestedField>>> selectorExpression)
+        {
+            throw new NotImplementedException();
         }
     }
 }

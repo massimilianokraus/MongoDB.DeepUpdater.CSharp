@@ -12,9 +12,9 @@ namespace MongoDB.DeepUpdater
             : base(document)
         { }
 
-        public ArrayFluent<TDocument, TNestedField> SelectArray<TNestedField>(Expression<Func<TField, IEnumerable<TNestedField>>> selectExpression)
+        public List<FieldDefinition<TDocument, TField>> GetFieldDefinitions()
         {
-            return null;
+            return InternalGetFieldDefinitions();
         }
 
         public UpdateDefinition<TDocument> Set(TField item)
