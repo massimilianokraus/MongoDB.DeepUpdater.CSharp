@@ -12,7 +12,7 @@ namespace MongoDB.DeepUpdater.Test.Models
             {
                 new University
                 {
-                    TestReferenceName = "Complete",
+                    TokenForTest = "Complete",
                     Location = "Trieste",
                     Administration = new InstitutionAdministration
                     {
@@ -157,14 +157,14 @@ namespace MongoDB.DeepUpdater.Test.Models
                 },
                 new University
                 {
-                    TestReferenceName = "NullLists",
+                    TokenForTest = "NullLists",
                     Location = "Narnya",
                     Administration = null,
                     Departments = null,
                 },
                 new University
                 {
-                    TestReferenceName = "EmptyLists",
+                    TokenForTest = "EmptyLists",
                     Location = "Narnya",
                     Administration = new InstitutionAdministration(),
                     Departments = new List<Department>(),
@@ -174,7 +174,7 @@ namespace MongoDB.DeepUpdater.Test.Models
 
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
-        public string TestReferenceName { get; set; }
+        public string TokenForTest { get; set; }
         public InstitutionAdministration Administration { get; set; }
         public string Location { get; set; }
         public List<Department> Departments { get; set; }

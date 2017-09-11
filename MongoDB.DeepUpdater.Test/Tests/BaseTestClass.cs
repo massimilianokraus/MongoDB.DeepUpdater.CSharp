@@ -37,5 +37,10 @@ namespace MongoDB.DeepUpdater.Test
 
 			_mongoCollection.InsertMany(_localCollection);
         }
+
+        protected University FindByToken(string token)
+        {
+            return _mongoCollection.Find(x => x.TokenForTest == token).First();
+        }
 	}
 }

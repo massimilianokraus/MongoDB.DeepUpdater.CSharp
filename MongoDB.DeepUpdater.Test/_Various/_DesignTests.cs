@@ -11,7 +11,7 @@ namespace MongoDB.DeepUpdater.Test._Various
     [TestClass]
     public class _DesignTests : BaseTestClass
     {
-        [TestMethod]
+        //[TestMethod]
         public void Design()
         {
             //Expression<Func<University, bool>> filter = x => x.TestReferenceName == "Complete";
