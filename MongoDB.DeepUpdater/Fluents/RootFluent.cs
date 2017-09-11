@@ -6,8 +6,16 @@ namespace MongoDB.DeepUpdater
 {
     public class RootFluent<TDocument> : SingleFluent<TDocument, TDocument>
     {
-        public RootFluent(TDocument document)
-            : base(document)
-        { }
+        internal RootFluent(TDocument document)
+            : base(document, new List<SingleContainer<TDocument>>())
+        {
+            var documentContainer = new SingleContainer<TDocument>
+            {
+                Item = document,
+                UpdateStrings = new List<string>()
+            };
+
+            Items.Add(documentContainer);
+        }
     }
 }

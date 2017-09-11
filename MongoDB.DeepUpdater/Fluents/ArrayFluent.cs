@@ -1,23 +1,55 @@
 ﻿using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MongoDB.DeepUpdater
 {
     public class ArrayFluent<TDocument, TField> : UpdateFluent<TDocument, TField>
     {
-        public ArrayFluent(TDocument document)
+        internal ArrayFluent(TDocument document, List<ArrayContainer<TField>> items)
             : base(document)
-        { }
-
-        public FieldFluent<TDocument, TField> Where(Func<TField, bool> selector)
         {
-            throw new NotImplementedException();
+            if (items == null) throw new ArgumentNullException(nameof(items));
+            Items = items;
+        }
+
+        public FieldFluent<TDocument, TField> Where(Func<TField, bool> filter)
+        {
+            var newItems = new List<SingleContainer<TField>>();
+
+            foreach (var container in Items)
+            {
+                for (int itemIndex = 0; itemIndex < container.Items.Count; itemIndex++)
+                {
+                    var item = container.Items[itemIndex];
+
+                    if (filter(item))
+                    {
+                        var newList = container.UpdateStrings.ToList();
+
+                        newList.Add(itemIndex.ToString());
+
+                        newItems.Add(new SingleContainer<TField>
+                        {
+                            Item = item,
+                            UpdateStrings = newList
+                        });
+                    }
+                }
+            }
+
+            return new FieldFluent<TDocument, TField>(Document, newItems);
         }
 
         public List<FieldDefinition<TDocument>> GetFieldDefinitions()
         {
-            throw new NotImplementedException();
+            var updateStrings = Items
+                .Select(i => i.UpdateStrings)
+                .Select(us => string.Join(".", us))
+                .ToList();
+
+            return updateStrings.Select(us => (FieldDefinition<TDocument>)us).ToList();
         }
 
         public UpdateDefinition<TDocument> AddToSet(TField item)
@@ -59,5 +91,7 @@ namespace MongoDB.DeepUpdater
         {
             throw new NotImplementedException();
         }
+
+        internal List<ArrayContainer<TField>> Items;
     }
 }

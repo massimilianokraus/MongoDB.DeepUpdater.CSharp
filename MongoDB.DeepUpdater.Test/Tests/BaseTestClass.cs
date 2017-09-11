@@ -43,14 +43,18 @@ namespace MongoDB.DeepUpdater.Test
             return _mongoCollection.Find(x => x.TokenForTest == token).First();
         }
 
-        protected string RenderFieldDef(FieldDefinition<University> fd)
+        protected string RenderFieldDef(FieldDefinition<University> fieldDefinition)
         {
-            return fd.Render(_mongoCollection.DocumentSerializer, _mongoCollection.Settings.SerializerRegistry).ToString();
+            return fieldDefinition
+                .Render(_mongoCollection.DocumentSerializer, _mongoCollection.Settings.SerializerRegistry)
+                .FieldName;
         }
 
-        protected string RenderFieldDef<T>(FieldDefinition<University, T> fd)
+        protected string RenderFieldDef<T>(FieldDefinition<University, T> fieldDefinition)
         {
-            return fd.Render(_mongoCollection.DocumentSerializer, _mongoCollection.Settings.SerializerRegistry).ToString();
+            return fieldDefinition
+                .Render(_mongoCollection.DocumentSerializer, _mongoCollection.Settings.SerializerRegistry)
+                .FieldName;
         }
     }
 }

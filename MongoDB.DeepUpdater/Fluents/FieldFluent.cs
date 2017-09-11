@@ -8,8 +8,8 @@ namespace MongoDB.DeepUpdater
 {
     public class FieldFluent<TDocument, TField> : SingleFluent<TDocument, TField>
     {
-        public FieldFluent(TDocument document)
-            : base(document)
+        internal FieldFluent(TDocument document, List<SingleContainer<TField>> items)
+            : base(document, items)
         { }
 
         public List<FieldDefinition<TDocument, TField>> GetFieldDefinitions()

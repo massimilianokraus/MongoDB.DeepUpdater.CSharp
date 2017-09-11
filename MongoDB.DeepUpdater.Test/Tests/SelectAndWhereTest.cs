@@ -2,8 +2,6 @@
 using MongoDB.DeepUpdater.Test.Models;
 using MongoDB.Driver;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MongoDB.DeepUpdater.Test.Tests
 {
@@ -22,10 +20,23 @@ namespace MongoDB.DeepUpdater.Test.Tests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void SelectArray_Expression_Null()
+        {
+            var univ = FindByToken("Complete");
+            Assert.IsNotNull(univ);
+
+            var update = Builders<University>.Update
+                .Deep(univ)
+                .SelectArray<Department>(null);
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(NullReferenceException))]
         public void Select_SingleThroughNullProperty()
         {
             var univ = FindByToken("NullLists");
+            Assert.IsNotNull(univ);
 
             var update = Builders<University>.Update
                 .Deep(univ)
@@ -37,11 +48,36 @@ namespace MongoDB.DeepUpdater.Test.Tests
         public void Select_DoubleThroughNullProperty()
         {
             var univ = FindByToken("NullLists");
+            Assert.IsNotNull(univ);
 
             var update = Builders<University>.Update
                 .Deep(univ)
                 .Select(x => x.Administration)
                 .Select(x => x.Rector);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(NullReferenceException))]
+        public void SelectArray_SingleThroughNullProperty()
+        {
+            var univ = FindByToken("NullLists");
+            Assert.IsNotNull(univ);
+
+            var update = Builders<University>.Update
+                .Deep(univ)
+                .Select(x => x.Administration.Employees);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(NullReferenceException))]
+        public void SelectArray_DoubleThroughNullProperty()
+        {
+            var univ = FindByToken("NullLists");
+
+            var update = Builders<University>.Update
+                .Deep(univ)
+                .Select(x => x.Administration)
+                .Select(x => x.Employees);
         }
 
         [TestMethod]
@@ -95,7 +131,7 @@ namespace MongoDB.DeepUpdater.Test.Tests
             Assert.AreEqual(1, fieldDefinitions.Count);
 
             var fdString = RenderFieldDef(fieldDefinitions[0]);
-            Assert.AreEqual("Administration.Rector.Name", fdString);
+            Assert.AreEqual("Departments", fdString);
         }
 
         [TestMethod]
@@ -143,7 +179,7 @@ namespace MongoDB.DeepUpdater.Test.Tests
             Assert.AreEqual("Administration.Employees.0", fdString1);
 
             var fdString2 = RenderFieldDef(fieldDefinitions[1]);
-            Assert.AreEqual("Administration.Employees.3", fdString1);
+            Assert.AreEqual("Administration.Employees.3", fdString2);
 
             var fdString3 = RenderFieldDef(fieldDefinitions[2]);
             Assert.AreEqual("Administration.Employees.4", fdString3);
