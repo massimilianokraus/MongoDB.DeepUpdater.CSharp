@@ -68,7 +68,7 @@ If you want to reach an array, you can use `SelectArray`. For example:
 
 In this case you can use all the array-operators, like `AddToSet`, or `PushEach`, etc.
 
-If you use `Select` with an array, and not `SelectArray`, you cannot use the array-operators, just the single-property ones. Thus, you can re-set the entire array, but you can add/remove elements.
+If you use `Select` with an array, and not `SelectArray`, you cannot use the array-operators, just the single-property ones. Thus, you can re-set the entire array, but you can't add/remove elements.
 
 You can select a nested property or array:
 
