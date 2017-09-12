@@ -54,42 +54,100 @@ namespace MongoDB.DeepUpdater
 
         public UpdateDefinition<TDocument> AddToSet(TField item)
         {
-            throw new NotImplementedException();
+            return Do(Builders<TDocument>.Update.AddToSet, item);
         }
 
         public UpdateDefinition<TDocument> AddToSetEach(IEnumerable<TField> items)
         {
-            throw new NotImplementedException();
+            return Do(Builders<TDocument>.Update.AddToSetEach, items);
         }
 
         public UpdateDefinition<TDocument> Push(TField item)
         {
-            throw new NotImplementedException();
+            return Do(Builders<TDocument>.Update.Push, item);
         }
 
-        public UpdateDefinition<TDocument> PushEach(IEnumerable<TField> items)
+        public UpdateDefinition<TDocument> PushEach(IEnumerable<TField> items, int? slice = null, int? position = null, SortDefinition<TField> sort = null)
         {
-            throw new NotImplementedException();
+            var builder = Builders<TDocument>.Update;
+
+            var fieldDefinitions = GetFieldDefinitions();
+
+            var updateDefinitions = fieldDefinitions.Select(fd => Builders<TDocument>.Update.PushEach(fd, items, slice, position, sort));
+
+            var combined = builder.Combine(updateDefinitions);
+
+            return combined;
         }
 
-        public UpdateDefinition<TDocument> PopFirst(TField item)
+        public UpdateDefinition<TDocument> PopFirst()
         {
-            throw new NotImplementedException();
+            return Do(Builders<TDocument>.Update.PopFirst);
         }
 
-        public UpdateDefinition<TDocument> PopLast(TField item)
+        public UpdateDefinition<TDocument> PopLast()
         {
-            throw new NotImplementedException();
+            return Do(Builders<TDocument>.Update.PopLast);
         }
 
         public UpdateDefinition<TDocument> Pull(TField item)
         {
-            throw new NotImplementedException();
+            return Do(Builders<TDocument>.Update.Pull, item);
         }
 
         public UpdateDefinition<TDocument> PullAll(IEnumerable<TField> items)
         {
-            throw new NotImplementedException();
+            return Do(Builders<TDocument>.Update.PullAll, items);
+        }
+
+        internal UpdateDefinition<TDocument> Do(
+            Func<FieldDefinition<TDocument>, UpdateDefinition<TDocument>> updateOperator)
+        {
+            if (updateOperator == null) throw new ArgumentNullException(nameof(updateOperator));
+
+            var builder = Builders<TDocument>.Update;
+
+            var fieldDefinitions = GetFieldDefinitions();
+
+            var updateDefinitions = fieldDefinitions.Select(updateOperator);
+
+            var combined = builder.Combine(updateDefinitions);
+
+            return combined;
+        }
+
+        internal UpdateDefinition<TDocument> Do(
+            Func<FieldDefinition<TDocument>, TField, UpdateDefinition<TDocument>> updateCreator,
+            TField item)
+        {
+            if (updateCreator == null) throw new ArgumentNullException(nameof(updateCreator));
+
+            var builder = Builders<TDocument>.Update;
+
+            var fieldDefinitions = GetFieldDefinitions();
+
+            var updateDefinitions = fieldDefinitions.Select(fd => updateCreator(fd, item));
+
+            var combined = builder.Combine(updateDefinitions);
+
+            return combined;
+        }
+
+        internal UpdateDefinition<TDocument> Do(
+            Func<FieldDefinition<TDocument>, IEnumerable<TField>, UpdateDefinition<TDocument>> updateOperator,
+            IEnumerable<TField> items)
+        {
+            if (updateOperator == null) throw new ArgumentNullException(nameof(updateOperator));
+
+            var builder = Builders<TDocument>.Update;
+
+            var fieldDefinitions = GetFieldDefinitions();
+
+            var updateDefinitions = fieldDefinitions.Select(fd => updateOperator(fd, items));
+
+            var combined = builder.Combine(updateDefinitions);
+
+            return combined;
         }
 
         internal List<ArrayContainer<TField>> Items;

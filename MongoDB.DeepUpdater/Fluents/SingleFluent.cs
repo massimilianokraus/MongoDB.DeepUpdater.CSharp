@@ -36,7 +36,7 @@ namespace MongoDB.DeepUpdater
                 .Select(containerItem => new SingleContainer<TNestedField>
                     {
                         Item = selector(containerItem.Item),
-                        UpdateStrings = containerItem.UpdateStrings.Union(new[] { newUpdateString }).ToList(),
+                        UpdateStrings = containerItem.UpdateStrings.Concat(new[] { newUpdateString }).ToList(),
                     })
                 .ToList();
 
@@ -54,7 +54,7 @@ namespace MongoDB.DeepUpdater
                 .Select(containerItem => new ArrayContainer<TNestedField>
                     {
                         Items = selector(containerItem.Item).ToList(),
-                        UpdateStrings = containerItem.UpdateStrings.Union(new[] { newUpdateString }).ToList()
+                        UpdateStrings = containerItem.UpdateStrings.Concat(new[] { newUpdateString }).ToList()
                     })
                 .ToList();
 

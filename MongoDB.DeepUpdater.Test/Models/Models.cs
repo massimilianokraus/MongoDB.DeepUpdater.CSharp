@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using System;
 using System.Collections.Generic;
 
 namespace MongoDB.DeepUpdater.Test.Models
@@ -16,13 +17,17 @@ namespace MongoDB.DeepUpdater.Test.Models
                     Location = "Trieste",
                     Administration = new InstitutionAdministration
                     {
-                        Rector = new Person { Name = "Massimiliano Kraus" },
+                        Chancellor = new Person
+                        {
+                            Name = "Anders Hejlsberg",
+                            Age = 57,
+                        },
                         Employees = new List<Person>
                         {
                             new Person { Name = "Al Middlewest" },
-                            new Person { Name = "Phil Morris" },
+                            new Person { Name = "Phil Morris", Hired = new DateTime(2010, 09, 5, 00, 00, 00, DateTimeKind.Utc) },
                             new Person { Name = "Bob Marley" },
-                            new Person { Name = "Alicia Boys" },
+                            new Person { Name = "Alicia Boys", Hired = new DateTime(2015, 11, 30, 00, 00, 00, DateTimeKind.Utc) },
                             new Person { Name = "Alan Silvestri" },
                         }
                     },
@@ -32,21 +37,23 @@ namespace MongoDB.DeepUpdater.Test.Models
                         {
                             Area = "Engineering",
                             MacroArea = "Science",
-                            Courses = new List<Course>
+                            Programs = new List<Program>
                             {
-                                new Course
+                                new Program
                                 {
                                     Name = "Civil Engineering",
-                                    CourseYears = new List<CourseYear>()
+                                    Cost = 20000,
+                                    Years = new List<Year>()
                                 },
-                                new Course
+                                new Program
                                 {
                                     Name = "Marine Engineering",
-                                    CourseYears = new List<CourseYear>
+                                    Cost = 25000,
+                                    Years = new List<Year>
                                     {
-                                        new CourseYear
+                                        new Year
                                         {
-                                            Number = 1,
+                                            Order = 1,
                                             Classes = new List<Class>
                                             {
                                                 new Class { Name = "Ship Buildings", Credits = 12 },
@@ -55,14 +62,15 @@ namespace MongoDB.DeepUpdater.Test.Models
                                         },
                                     },
                                 },
-                                new Course
+                                new Program
                                 {
                                     Name = "Informatic Engineering",
-                                    CourseYears = new List<CourseYear>
+                                    Cost = 15000,
+                                    Years = new List<Year>
                                     {
-                                        new CourseYear
+                                        new Year
                                         {
-                                            Number = 1,
+                                            Order = 1,
                                             Classes = new List<Class>
                                             {
                                                 new Class { Name = "Analysis 1", Credits = 12 },
@@ -70,9 +78,9 @@ namespace MongoDB.DeepUpdater.Test.Models
                                                 new Class { Name = "Geometry", Credits = 3 },
                                             },
                                         },
-                                        new CourseYear
+                                        new Year
                                         {
-                                            Number = 2,
+                                            Order = 2,
                                             Classes = new List<Class>
                                             {
                                                 new Class { Name = "Signals Theory", Credits = 6 },
@@ -81,9 +89,9 @@ namespace MongoDB.DeepUpdater.Test.Models
                                                 new Class { Name = "Analysis 2", Credits = 6 },
                                             },
                                         },
-                                        new CourseYear
+                                        new Year
                                         {
-                                            Number = 3,
+                                            Order = 3,
                                             Classes = new List<Class>
                                             {
                                                 new Class { Name = "Databases", Credits = 9 },
@@ -99,25 +107,26 @@ namespace MongoDB.DeepUpdater.Test.Models
                         {
                             Area = "Physics",
                             MacroArea = "Science",
-                            Courses = new List<Course>
+                            Programs = new List<Program>
                             {
-                                new Course
+                                new Program
                                 {
-                                    Name = "Material Physics",
-                                    CourseYears = new List<CourseYear>
+                                    Name = "Basic of Dynamics",
+                                    Cost = 20000,
+                                    Years = new List<Year>
                                     {
-                                        new CourseYear
+                                        new Year
                                         {
-                                            Number = 1,
+                                            Order = 1,
                                             Classes = new List<Class>
                                             {
                                                 new Class { Name = "Base Physics", Credits = 12 },
                                                 new Class { Name = "Analysis 1", Credits = 12 },
                                             },
                                         },
-                                        new CourseYear
+                                        new Year
                                         {
-                                            Number = 2,
+                                            Order = 2,
                                             Classes = new List<Class>
                                             {
                                                 new Class { Name = "Advanced Physics", Credits = 12 },
@@ -132,23 +141,28 @@ namespace MongoDB.DeepUpdater.Test.Models
                         {
                             Area = "EmptyArea",
                             MacroArea = "Science",
-                            Courses = new List<Course>(),
+                            Programs = new List<Program>(),
                         },
                         new Department
                         {
                             Area = "Literature",
                             MacroArea = "Humanism",
-                            Courses = new List<Course>
+                            Programs = new List<Program>
                             {
-                                new Course { Name = "Ancient Literature" },
-                                new Course
+                                new Program
+                                {
+                                    Name = "Ancient Literature",
+                                    Cost = 17000,
+                                },
+                                new Program
                                 {
                                     Name = "Modern Literature",
-                                    CourseYears = new List<CourseYear>
+                                    Cost = 14000,
+                                    Years = new List<Year>
                                     {
-                                        new CourseYear
+                                        new Year
                                         {
-                                            Number = 1,
+                                            Order = 1,
                                             Classes = new List<Class>
                                             {
                                                 new Class { Name = "Italian Grammar 1", Credits = 6 },
@@ -173,7 +187,10 @@ namespace MongoDB.DeepUpdater.Test.Models
                 {
                     TokenForTest = "EmptyLists",
                     Location = "Narnya",
-                    Administration = new InstitutionAdministration(),
+                    Administration = new InstitutionAdministration
+                    {
+                        Employees = new List<Person>(),
+                    },
                     Departments = new List<Department>(),
                 }
             };
@@ -191,18 +208,19 @@ namespace MongoDB.DeepUpdater.Test.Models
     {
         public string Area { get; set; }
         public string MacroArea { get; set; }
-        public List<Course> Courses { get; set; }
+        public List<Program> Programs { get; set; }
     }
 
-    public class Course
+    public class Program
     {
         public string Name { get; set; }
-        public List<CourseYear> CourseYears { get; set; }
+        public double Cost { get; set; }
+        public List<Year> Years { get; set; }
     }
 
-    public class CourseYear
+    public class Year
     {
-        public int Number { get; set; }
+        public int Order { get; set; }
         public List<Class> Classes { get; set; }
     }
 
@@ -215,7 +233,7 @@ namespace MongoDB.DeepUpdater.Test.Models
 
     public class InstitutionAdministration
     {
-        public Person Rector { get; set; }
+        public Person Chancellor { get; set; }
         public List<Person> Employees { get; set; }
     }
 
@@ -223,5 +241,6 @@ namespace MongoDB.DeepUpdater.Test.Models
     {
         public string Name { get; set; }
         public int Age { get; set; }
+        public DateTime Hired { get; set; }
     }
 }

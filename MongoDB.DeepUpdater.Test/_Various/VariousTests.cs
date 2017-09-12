@@ -14,6 +14,21 @@ namespace MongoDB.DeepUpdater.Test.TestClasses
     [TestClass]
     public class VariousTests : BaseTestClass
     {
+        [TestMethod]
+        public void PopFirst_OnEmptyArray()
+        {
+            var univ = FindByToken("Complete");
+
+            var update = Builders<University>.Update
+                .Deep(univ)
+                .SelectArray(x => x.Departments)
+                .Where(x => true)
+                .SelectArray(x => x.Programs)
+                .PopFirst();
+
+            _mongoCollection.UpdateOne(x => x.Id == univ.Id, update);
+        }
+
         //[TestMethod]
         //[ExpectedException(typeof(ArgumentException))]
         //public void Combine_Empty_List()

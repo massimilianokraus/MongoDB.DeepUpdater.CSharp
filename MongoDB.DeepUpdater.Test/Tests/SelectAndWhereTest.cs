@@ -40,7 +40,7 @@ namespace MongoDB.DeepUpdater.Test.Tests
 
             var update = Builders<University>.Update
                 .Deep(univ)
-                .Select(x => x.Administration.Rector);
+                .Select(x => x.Administration.Chancellor);
         }
 
         [TestMethod]
@@ -53,7 +53,7 @@ namespace MongoDB.DeepUpdater.Test.Tests
             var update = Builders<University>.Update
                 .Deep(univ)
                 .Select(x => x.Administration)
-                .Select(x => x.Rector);
+                .Select(x => x.Chancellor);
         }
 
         [TestMethod]
@@ -81,6 +81,35 @@ namespace MongoDB.DeepUpdater.Test.Tests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void SelectArray_Null()
+        {
+            var univ = FindByToken("NullLists");
+
+            var update = Builders<University>.Update
+                .Deep(univ)
+                .SelectArray(x => x.Departments);
+        }
+
+        [TestMethod]
+        public void Select_NullArray()
+        {
+            var univ = FindByToken("NullLists");
+
+            var update = Builders<University>.Update
+                .Deep(univ)
+                .Select(x => x.Departments);
+
+            var fieldDefinitions = update.GetFieldDefinitions();
+
+            Assert.IsNotNull(fieldDefinitions);
+            Assert.AreEqual(1, fieldDefinitions.Count);
+
+            var fd = RenderFieldDef(fieldDefinitions[0]);
+            Assert.AreEqual("Departments", fd);
+        }
+
+        [TestMethod]
         public void Select_Simple()
         {
             var univ = FindByToken("Complete");
@@ -105,7 +134,7 @@ namespace MongoDB.DeepUpdater.Test.Tests
 
             var update = Builders<University>.Update
                 .Deep(univ)
-                .Select(x => x.Administration.Rector.Name);
+                .Select(x => x.Administration.Chancellor.Name);
 
             var fieldDefinitions = update.GetFieldDefinitions();
 
@@ -113,7 +142,7 @@ namespace MongoDB.DeepUpdater.Test.Tests
             Assert.AreEqual(1, fieldDefinitions.Count);
 
             var fdString = RenderFieldDef(fieldDefinitions[0]);
-            Assert.AreEqual("Administration.Rector.Name", fdString);
+            Assert.AreEqual("Administration.Chancellor.Name", fdString);
         }
 
         [TestMethod]
@@ -143,8 +172,8 @@ namespace MongoDB.DeepUpdater.Test.Tests
                 .Deep(univ)
                 .SelectArray(x => x.Departments)
                 .Where(x => x.MacroArea == "Science")
-                .SelectArray(x => x.Courses)
-                .Where(x => x.CourseYears.Count > 1)
+                .SelectArray(x => x.Programs)
+                .Where(x => x.Years.Count > 1)
                 .Select(x => x.Name);
 
             var fieldDefinitions = update.GetFieldDefinitions();
@@ -153,10 +182,10 @@ namespace MongoDB.DeepUpdater.Test.Tests
             Assert.AreEqual(2, fieldDefinitions.Count);
 
             var fdString1 = RenderFieldDef(fieldDefinitions[0]);
-            Assert.AreEqual("Departments.0.Courses.2.Name", fdString1);
+            Assert.AreEqual("Departments.0.Programs.2.Name", fdString1);
 
             var fdString2 = RenderFieldDef(fieldDefinitions[1]);
-            Assert.AreEqual("Departments.1.Courses.0.Name", fdString2);
+            Assert.AreEqual("Departments.1.Programs.0.Name", fdString2);
         }
 
         [TestMethod]
@@ -183,6 +212,31 @@ namespace MongoDB.DeepUpdater.Test.Tests
 
             var fdString3 = RenderFieldDef(fieldDefinitions[2]);
             Assert.AreEqual("Administration.Employees.4", fdString3);
+        }
+
+        [TestMethod]
+        public void DeepSelect3()
+        {
+            var univ = FindByToken("Complete");
+
+            var update = Builders<University>.Update
+                .Deep(univ)
+                .SelectArray(x => x.Departments)
+                .Where(x => x.Area == "Engineering")
+                .SelectArray(x => x.Programs)
+                .Where(x => x.Name == "Informatic Engineering")
+                .SelectArray(x => x.Years)
+                .Where(x => x.Order == 3)
+                .SelectArray(x => x.Classes)
+                .Where(x => x.Name == "Networks");
+
+            var fieldDefinitions = update.GetFieldDefinitions();
+
+            Assert.IsNotNull(fieldDefinitions);
+            Assert.AreEqual(1, fieldDefinitions.Count);
+
+            var fd = RenderFieldDef(fieldDefinitions[0]);
+            Assert.AreEqual("Departments.0.Programs.2.Years.2.Classes.2", fd);
         }
     }
 }
