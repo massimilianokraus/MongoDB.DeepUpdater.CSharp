@@ -6,6 +6,6 @@ namespace MongoDB.DeepUpdater
     {
         protected UpdateContainer() { }
 
-        internal List<string> UpdateStrings { get; set; }
+        internal IEnumerable<string> UpdateStrings { get; set; }
     }
 }

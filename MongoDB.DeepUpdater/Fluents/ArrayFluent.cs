@@ -7,49 +7,64 @@ namespace MongoDB.DeepUpdater
 {
     public class ArrayFluent<TDocument, TField> : UpdateFluent<TDocument, TField>
     {
-        internal ArrayFluent(TDocument document, List<ArrayContainer<TField>> items)
+        internal ArrayFluent(TDocument document, IEnumerable<ArrayContainer<TField>> items)
             : base(document)
         {
             if (items == null) throw new ArgumentNullException(nameof(items));
-            Items = items;
+            Containers = items;
         }
 
         public FieldFluent<TDocument, TField> Where(Func<TField, bool> filter)
         {
-            var newItems = new List<SingleContainer<TField>>();
+            var newItems = Containers
+                .Select(container => createRecursiveContainers(container, filter))
+                .SelectMany(x => x);
 
-            foreach (var container in Items)
-            {
-                for (int itemIndex = 0; itemIndex < container.Items.Count; itemIndex++)
-                {
-                    var item = container.Items[itemIndex];
+            //var newItems = new List<SingleContainer<TField>>();
+            
+            //foreach (var container in Items)
+            //{
+            //    for (int itemIndex = 0; itemIndex < container.Items.Count; itemIndex++)
+            //    {
+            //        var item = container.Items[itemIndex];
 
-                    if (filter(item))
-                    {
-                        var newList = container.UpdateStrings.ToList();
+            //        if (filter(item))
+            //        {
+            //            var newList = container.UpdateStrings.Concat(new[] { itemIndex.ToString() });
 
-                        newList.Add(itemIndex.ToString());
-
-                        newItems.Add(new SingleContainer<TField>
-                        {
-                            Item = item,
-                            UpdateStrings = newList
-                        });
-                    }
-                }
-            }
+            //            newItems.Add(new SingleContainer<TField>
+            //            {
+            //                Item = item,
+            //                UpdateStrings = newList
+            //            });
+            //        }
+            //    }
+            //}
 
             return new FieldFluent<TDocument, TField>(Document, newItems);
         }
 
-        public List<FieldDefinition<TDocument>> GetFieldDefinitions()
+        private IEnumerable<SingleContainer<TField>> createRecursiveContainers(ArrayContainer<TField> container, Func<TField, bool> filter)
         {
-            var updateStrings = Items
+            return container.Items
+                .Select((item, index) => new { Item = item, Index = index })
+                .Where(wrapper => filter(wrapper.Item))
+                .Select(wrapper =>
+                    {
+                        return new SingleContainer<TField>
+                        {
+                            Item = wrapper.Item,
+                            UpdateStrings = container.UpdateStrings.Concat(new[] { wrapper.Index.ToString() })
+                        };
+                    });
+        }
+
+        public IEnumerable<FieldDefinition<TDocument>> GetFieldDefinitions()
+        {
+            return Containers
                 .Select(i => i.UpdateStrings)
                 .Select(us => string.Join(".", us))
-                .ToList();
-
-            return updateStrings.Select(us => (FieldDefinition<TDocument>)us).ToList();
+                .Select(us => (FieldDefinition<TDocument>)us);
         }
 
         public UpdateDefinition<TDocument> AddToSet(TField item)
@@ -150,6 +165,6 @@ namespace MongoDB.DeepUpdater
             return combined;
         }
 
-        internal List<ArrayContainer<TField>> Items;
+        internal IEnumerable<ArrayContainer<TField>> Containers;
     }
 }

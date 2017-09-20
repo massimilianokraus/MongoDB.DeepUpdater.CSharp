@@ -2,18 +2,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 
 namespace MongoDB.DeepUpdater
 {
     public class FieldFluent<TDocument, TField> : SingleFluent<TDocument, TField>
     {
-        internal FieldFluent(TDocument document, List<SingleContainer<TField>> items)
+        internal FieldFluent(TDocument document, IEnumerable<SingleContainer<TField>> items)
             : base(document, items)
         { }
 
-        public List<FieldDefinition<TDocument, TField>> GetFieldDefinitions()
+        public IEnumerable<FieldDefinition<TDocument, TField>> GetFieldDefinitions()
         {
             return InternalGetFieldDefinitions();
         }

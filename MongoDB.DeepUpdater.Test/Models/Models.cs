@@ -228,7 +228,6 @@ namespace MongoDB.DeepUpdater.Test.Models
     {
         public string Name { get; set; }
         public int Credits { get; set; }
-        public string Program { get; set; }
     }
 
     public class InstitutionAdministration

@@ -1,21 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace MongoDB.DeepUpdater
 {
     public class RootFluent<TDocument> : SingleFluent<TDocument, TDocument>
     {
-        internal RootFluent(TDocument document)
-            : base(document, new List<SingleContainer<TDocument>>())
+        private static IEnumerable<SingleContainer<TDocument>> createRootContainersList(TDocument document)
         {
-            var documentContainer = new SingleContainer<TDocument>
+            return new[]
             {
-                Item = document,
-                UpdateStrings = new List<string>()
+                new SingleContainer<TDocument>
+                {
+                    Item = document,
+                    UpdateStrings = new List<string>()
+                }
             };
-
-            Items.Add(documentContainer);
         }
+
+        internal RootFluent(TDocument document)
+            : base(document, createRootContainersList(document))
+        { }
     }
 }

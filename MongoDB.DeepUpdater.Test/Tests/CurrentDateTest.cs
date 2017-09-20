@@ -2,8 +2,6 @@
 using MongoDB.DeepUpdater.Test.Models;
 using MongoDB.Driver;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MongoDB.DeepUpdater.Test.Tests
 {

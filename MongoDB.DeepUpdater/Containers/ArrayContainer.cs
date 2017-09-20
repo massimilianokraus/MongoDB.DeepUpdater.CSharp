@@ -4,6 +4,6 @@ namespace MongoDB.DeepUpdater
 {
     internal class ArrayContainer<TItem> : UpdateContainer<TItem>
     {
-        internal List<TItem> Items { get; set; }
+        internal IEnumerable<TItem> Items { get; set; }
     }
 }

@@ -2,11 +2,20 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <SignAssembly>false</SignAssembly>
+    <Authors>Massimiliano Kraus</Authors>
+    <Company>Massimiliano Kraus</Company>
+    <Product>MongoDB DeepUpdater</Product>
+    <Description>An extension to the official driver of MongoDB for C#, that allows more compiled and powerful update commands.</Description>
+    <PackageLicenseUrl>https://github.com/massimilianokraus/MongoDB.DeepUpdater.CSharp/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/massimilianokraus/MongoDB.DeepUpdater.CSharp</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/massimilianokraus/MongoDB.DeepUpdater.CSharp</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <PackageTags>deepupdater mongodb nosql extension update</PackageTags>
+    <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
+    <Version>1.1.0</Version>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="_Hangar.cs" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="MongoDB.Driver" Version="2.4.4" />
