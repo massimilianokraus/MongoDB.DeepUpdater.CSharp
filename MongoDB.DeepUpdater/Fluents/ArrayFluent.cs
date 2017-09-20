@@ -7,49 +7,43 @@ namespace MongoDB.DeepUpdater
 {
     public class ArrayFluent<TDocument, TField> : UpdateFluent<TDocument, TField>
     {
-        internal ArrayFluent(TDocument document, List<ArrayContainer<TField>> items)
+        internal ArrayFluent(TDocument document, IEnumerable<ArrayContainer<TField>> items)
             : base(document)
         {
             if (items == null) throw new ArgumentNullException(nameof(items));
-            Items = items;
+            Containers = items;
         }
 
         public FieldFluent<TDocument, TField> Where(Func<TField, bool> filter)
         {
-            var newItems = new List<SingleContainer<TField>>();
-
-            foreach (var container in Items)
-            {
-                for (int itemIndex = 0; itemIndex < container.Items.Count; itemIndex++)
-                {
-                    var item = container.Items[itemIndex];
-
-                    if (filter(item))
-                    {
-                        var newList = container.UpdateStrings.ToList();
-
-                        newList.Add(itemIndex.ToString());
-
-                        newItems.Add(new SingleContainer<TField>
-                        {
-                            Item = item,
-                            UpdateStrings = newList
-                        });
-                    }
-                }
-            }
+            var newItems = Containers
+                .Select(container => createRecursiveContainers(container, filter))
+                .SelectMany(x => x);
 
             return new FieldFluent<TDocument, TField>(Document, newItems);
         }
 
+        private IEnumerable<SingleContainer<TField>> createRecursiveContainers(ArrayContainer<TField> container, Func<TField, bool> filter)
+        {
+            return container.Items
+                .Select((item, index) => new { Item = item, Index = index })
+                .Where(wrapper => filter(wrapper.Item))
+                .Select(wrapper => new SingleContainer<TField>(
+                    wrapper.Item,
+                    container.UpdateStrings.Concat(new[] { wrapper.Index.ToString() })));
+        }
+
         public List<FieldDefinition<TDocument>> GetFieldDefinitions()
         {
-            var updateStrings = Items
+            return InternalGetFieldDefinitions().ToList();
+        }
+
+        internal IEnumerable<FieldDefinition<TDocument>> InternalGetFieldDefinitions()
+        {
+            return Containers
                 .Select(i => i.UpdateStrings)
                 .Select(us => string.Join(".", us))
-                .ToList();
-
-            return updateStrings.Select(us => (FieldDefinition<TDocument>)us).ToList();
+                .Select(us => (FieldDefinition<TDocument>)us);
         }
 
         public UpdateDefinition<TDocument> AddToSet(TField item)
@@ -67,17 +61,10 @@ namespace MongoDB.DeepUpdater
             return Do(Builders<TDocument>.Update.Push, item);
         }
 
-        public UpdateDefinition<TDocument> PushEach(IEnumerable<TField> items, int? slice = null, int? position = null, SortDefinition<TField> sort = null)
+        public UpdateDefinition<TDocument> PushEach(
+            IEnumerable<TField> items, int? slice = null, int? position = null, SortDefinition<TField> sort = null)
         {
-            var builder = Builders<TDocument>.Update;
-
-            var fieldDefinitions = GetFieldDefinitions();
-
-            var updateDefinitions = fieldDefinitions.Select(fd => Builders<TDocument>.Update.PushEach(fd, items, slice, position, sort));
-
-            var combined = builder.Combine(updateDefinitions);
-
-            return combined;
+            return Do(fd => Builders<TDocument>.Update.PushEach(fd, items, slice, position, sort));
         }
 
         public UpdateDefinition<TDocument> PopFirst()
@@ -105,13 +92,9 @@ namespace MongoDB.DeepUpdater
         {
             if (updateOperator == null) throw new ArgumentNullException(nameof(updateOperator));
 
-            var builder = Builders<TDocument>.Update;
+            var updateDefinitions = GetFieldDefinitions().Select(updateOperator);
 
-            var fieldDefinitions = GetFieldDefinitions();
-
-            var updateDefinitions = fieldDefinitions.Select(updateOperator);
-
-            var combined = builder.Combine(updateDefinitions);
+            var combined = Builders<TDocument>.Update.Combine(updateDefinitions);
 
             return combined;
         }
@@ -122,13 +105,9 @@ namespace MongoDB.DeepUpdater
         {
             if (updateCreator == null) throw new ArgumentNullException(nameof(updateCreator));
 
-            var builder = Builders<TDocument>.Update;
+            var updateDefinitions = GetFieldDefinitions().Select(fd => updateCreator(fd, item));
 
-            var fieldDefinitions = GetFieldDefinitions();
-
-            var updateDefinitions = fieldDefinitions.Select(fd => updateCreator(fd, item));
-
-            var combined = builder.Combine(updateDefinitions);
+            var combined = Builders<TDocument>.Update.Combine(updateDefinitions);
 
             return combined;
         }
@@ -139,17 +118,13 @@ namespace MongoDB.DeepUpdater
         {
             if (updateOperator == null) throw new ArgumentNullException(nameof(updateOperator));
 
-            var builder = Builders<TDocument>.Update;
+            var updateDefinitions = GetFieldDefinitions().Select(fd => updateOperator(fd, items));
 
-            var fieldDefinitions = GetFieldDefinitions();
-
-            var updateDefinitions = fieldDefinitions.Select(fd => updateOperator(fd, items));
-
-            var combined = builder.Combine(updateDefinitions);
+            var combined = Builders<TDocument>.Update.Combine(updateDefinitions);
 
             return combined;
         }
 
-        internal List<ArrayContainer<TField>> Items;
+        internal IEnumerable<ArrayContainer<TField>> Containers;
     }
 }

@@ -2,6 +2,7 @@
 using MongoDB.DeepUpdater.Test.Models;
 using MongoDB.Driver;
 using System;
+using System.Linq;
 
 namespace MongoDB.DeepUpdater.Test.Tests
 {
@@ -41,6 +42,8 @@ namespace MongoDB.DeepUpdater.Test.Tests
             var update = Builders<University>.Update
                 .Deep(univ)
                 .Select(x => x.Administration.Chancellor);
+
+            update.GetFieldDefinitions();
         }
 
         [TestMethod]
@@ -54,6 +57,8 @@ namespace MongoDB.DeepUpdater.Test.Tests
                 .Deep(univ)
                 .Select(x => x.Administration)
                 .Select(x => x.Chancellor);
+
+            update.GetFieldDefinitions();
         }
 
         [TestMethod]
@@ -66,6 +71,8 @@ namespace MongoDB.DeepUpdater.Test.Tests
             var update = Builders<University>.Update
                 .Deep(univ)
                 .Select(x => x.Administration.Employees);
+
+            update.GetFieldDefinitions();
         }
 
         [TestMethod]
@@ -78,6 +85,8 @@ namespace MongoDB.DeepUpdater.Test.Tests
                 .Deep(univ)
                 .Select(x => x.Administration)
                 .Select(x => x.Employees);
+
+            update.GetFieldDefinitions();
         }
 
         [TestMethod]
@@ -89,6 +98,8 @@ namespace MongoDB.DeepUpdater.Test.Tests
             var update = Builders<University>.Update
                 .Deep(univ)
                 .SelectArray(x => x.Departments);
+
+            update.GetFieldDefinitions();
         }
 
         [TestMethod]

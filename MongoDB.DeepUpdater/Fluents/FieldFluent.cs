@@ -2,20 +2,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 
 namespace MongoDB.DeepUpdater
 {
     public class FieldFluent<TDocument, TField> : SingleFluent<TDocument, TField>
     {
-        internal FieldFluent(TDocument document, List<SingleContainer<TField>> items)
+        internal FieldFluent(TDocument document, IEnumerable<SingleContainer<TField>> items)
             : base(document, items)
         { }
 
         public List<FieldDefinition<TDocument, TField>> GetFieldDefinitions()
         {
-            return InternalGetFieldDefinitions();
+            return InternalGetFieldDefinitions().ToList();
         }
 
         public UpdateDefinition<TDocument> Set(TField item)
@@ -58,32 +56,20 @@ namespace MongoDB.DeepUpdater
             return Do(Builders<TDocument>.Update.BitwiseXor, item);
         }
 
+        public UpdateDefinition<TDocument> CurrentDate(UpdateDefinitionCurrentDateType? type = null)
+        {
+            return Do((fd, _) => Builders<TDocument>.Update.CurrentDate(fd, type), default(TField));
+        }
+
         internal UpdateDefinition<TDocument> Do(
             Func<FieldDefinition<TDocument, TField>, TField, UpdateDefinition<TDocument>> updateCreator,
                 TField item)
         {
             if (updateCreator == null) throw new ArgumentNullException(nameof(updateCreator));
             
-            var builder = Builders<TDocument>.Update;
+            var updateDefinitions = InternalGetFieldDefinitions().Select(fd => updateCreator(fd, item));
 
-            var fieldDefinitions = GetFieldDefinitions();
-
-            var updateDefinitions = fieldDefinitions.Select(fd => updateCreator(fd, item));
-
-            var combined = builder.Combine(updateDefinitions);
-
-            return combined;
-        }
-
-        public UpdateDefinition<TDocument> CurrentDate(UpdateDefinitionCurrentDateType? type = null)
-        {
-            var builder = Builders<TDocument>.Update;
-
-            var fieldDefinitions = GetFieldDefinitions();
-
-            var updateDefinitions = fieldDefinitions.Select(fd => builder.CurrentDate(fd, type));
-
-            var combined = builder.Combine(updateDefinitions);
+            var combined = Builders<TDocument>.Update.Combine(updateDefinitions);
 
             return combined;
         }
