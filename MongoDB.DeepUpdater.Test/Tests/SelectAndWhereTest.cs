@@ -43,7 +43,7 @@ namespace MongoDB.DeepUpdater.Test.Tests
                 .Deep(univ)
                 .Select(x => x.Administration.Chancellor);
 
-            update.GetFieldDefinitions().ToList();
+            update.GetFieldDefinitions();
         }
 
         [TestMethod]
@@ -58,7 +58,7 @@ namespace MongoDB.DeepUpdater.Test.Tests
                 .Select(x => x.Administration)
                 .Select(x => x.Chancellor);
 
-            update.GetFieldDefinitions().ToList();
+            update.GetFieldDefinitions();
         }
 
         [TestMethod]
@@ -72,7 +72,7 @@ namespace MongoDB.DeepUpdater.Test.Tests
                 .Deep(univ)
                 .Select(x => x.Administration.Employees);
 
-            update.GetFieldDefinitions().ToList();
+            update.GetFieldDefinitions();
         }
 
         [TestMethod]
@@ -86,7 +86,7 @@ namespace MongoDB.DeepUpdater.Test.Tests
                 .Select(x => x.Administration)
                 .Select(x => x.Employees);
 
-            update.GetFieldDefinitions().ToList();
+            update.GetFieldDefinitions();
         }
 
         [TestMethod]
@@ -99,7 +99,7 @@ namespace MongoDB.DeepUpdater.Test.Tests
                 .Deep(univ)
                 .SelectArray(x => x.Departments);
 
-            update.GetFieldDefinitions().ToList();
+            update.GetFieldDefinitions();
         }
 
         [TestMethod]
@@ -111,7 +111,7 @@ namespace MongoDB.DeepUpdater.Test.Tests
                 .Deep(univ)
                 .Select(x => x.Departments);
 
-            var fieldDefinitions = update.GetFieldDefinitions().ToList();
+            var fieldDefinitions = update.GetFieldDefinitions();
 
             Assert.IsNotNull(fieldDefinitions);
             Assert.AreEqual(1, fieldDefinitions.Count);
@@ -129,7 +129,7 @@ namespace MongoDB.DeepUpdater.Test.Tests
                 .Deep(univ)
                 .Select(x => x.Administration);
 
-            var fieldDefinitions = update.GetFieldDefinitions().ToList();
+            var fieldDefinitions = update.GetFieldDefinitions();
 
             Assert.IsNotNull(fieldDefinitions);
             Assert.AreEqual(1, fieldDefinitions.Count);
@@ -147,7 +147,7 @@ namespace MongoDB.DeepUpdater.Test.Tests
                 .Deep(univ)
                 .Select(x => x.Administration.Chancellor.Name);
 
-            var fieldDefinitions = update.GetFieldDefinitions().ToList();
+            var fieldDefinitions = update.GetFieldDefinitions();
 
             Assert.IsNotNull(fieldDefinitions);
             Assert.AreEqual(1, fieldDefinitions.Count);
@@ -165,7 +165,7 @@ namespace MongoDB.DeepUpdater.Test.Tests
                 .Deep(univ)
                 .SelectArray(x => x.Departments);
 
-            var fieldDefinitions = update.GetFieldDefinitions().ToList();
+            var fieldDefinitions = update.GetFieldDefinitions();
 
             Assert.IsNotNull(fieldDefinitions);
             Assert.AreEqual(1, fieldDefinitions.Count);
@@ -187,7 +187,7 @@ namespace MongoDB.DeepUpdater.Test.Tests
                 .Where(x => x.Years.Count > 1)
                 .Select(x => x.Name);
 
-            var fieldDefinitions = update.GetFieldDefinitions().ToList();
+            var fieldDefinitions = update.GetFieldDefinitions();
 
             Assert.IsNotNull(fieldDefinitions);
             Assert.AreEqual(2, fieldDefinitions.Count);
@@ -210,7 +210,7 @@ namespace MongoDB.DeepUpdater.Test.Tests
                 .SelectArray(x => x.Employees)
                 .Where(x => x.Name.StartsWith("A"));
 
-            var fieldDefinitions = update.GetFieldDefinitions().ToList();
+            var fieldDefinitions = update.GetFieldDefinitions();
 
             Assert.IsNotNull(fieldDefinitions);
             Assert.AreEqual(3, fieldDefinitions.Count);
@@ -241,7 +241,7 @@ namespace MongoDB.DeepUpdater.Test.Tests
                 .SelectArray(x => x.Classes)
                 .Where(x => x.Name == "Networks");
 
-            var fieldDefinitions = update.GetFieldDefinitions().ToList();
+            var fieldDefinitions = update.GetFieldDefinitions();
 
             Assert.IsNotNull(fieldDefinitions);
             Assert.AreEqual(1, fieldDefinitions.Count);

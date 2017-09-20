@@ -23,38 +23,47 @@ namespace MongoDB.DeepUpdater
                 .Select(us => (FieldDefinition<TDocument, TField>)us);
         }
 
-        public FieldFluent<TDocument, TNestedField> Select<TNestedField>(Expression<Func<TField, TNestedField>> selector)
+        public FieldFluent<TDocument, TNestedField> Select<TNestedField>(Expression<Func<TField, TNestedField>> selectorExpression)
         {
-            if (selector == null) throw new ArgumentNullException(nameof(selector));
+            if (selectorExpression == null) throw new ArgumentNullException(nameof(selectorExpression));
 
-            var newUpdateString = GetPropertyName(selector);
+            var selector = selectorExpression.Compile();
+            var newUpdateString = GetPropertyName(selectorExpression);
 
-            var nestedItems = Containers
-                .Select(containerItem => new SingleContainer<TNestedField>
-                    {
-                        Item = selector.Compile()(containerItem.Item),
-                        UpdateStrings = containerItem.UpdateStrings.Concat(new[] { newUpdateString }),
-                    });
+            var nestedItems = Containers.Select(containerItem => createNestedContainer(containerItem, selector, newUpdateString));
 
             return new FieldFluent<TDocument, TNestedField>(Document, nestedItems);
         }
 
-        public ArrayFluent<TDocument, TNestedField> SelectArray<TNestedField>(Expression<Func<TField, IEnumerable<TNestedField>>> selector)
+        private SingleContainer<TNestedField> createNestedContainer<TNestedField>(
+            SingleContainer<TField> container, Func<TField, TNestedField> selector, string newUpdateString)
         {
-            if (selector == null) throw new ArgumentNullException(nameof(selector));
+            var newUpdateStrings = container.UpdateStrings.Concat(new[] { newUpdateString });
+            var newItem = selector(container.Item);
 
-            var newUpdateString = GetPropertyName(selector);
+            return new SingleContainer<TNestedField>(newItem, newUpdateStrings);
+        }
 
+        public ArrayFluent<TDocument, TNestedField> SelectArray<TNestedField>(
+            Expression<Func<TField, IEnumerable<TNestedField>>> selectorExpression)
+        {
+            if (selectorExpression == null) throw new ArgumentNullException(nameof(selectorExpression));
 
+            var selector = selectorExpression.Compile();
+            var newUpdateString = GetPropertyName(selectorExpression);
 
-            var nestedItems = Containers
-                .Select(containerItem => new ArrayContainer<TNestedField>
-                    {
-                        Items = selector.Compile()(containerItem.Item),
-                        UpdateStrings = containerItem.UpdateStrings.Concat(new[] { newUpdateString })
-                    });
+            var nestedItems = Containers.Select(containerItem => createNestedContainer(containerItem, selector, newUpdateString));
 
             return new ArrayFluent<TDocument, TNestedField>(Document, nestedItems);
+        }
+
+        private ArrayContainer<TNestedField> createNestedContainer<TNestedField>(
+            SingleContainer<TField> container, Func<TField, IEnumerable<TNestedField>> selector, string newUpdateString)
+        {
+            var newUpdateStrings = container.UpdateStrings.Concat(new[] { newUpdateString });
+            var newItems = selector(container.Item);
+
+            return new ArrayContainer<TNestedField>(newItems, newUpdateStrings);
         }
 
         internal IEnumerable<SingleContainer<TField>> Containers;
