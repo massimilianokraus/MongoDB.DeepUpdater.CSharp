@@ -12,9 +12,13 @@
     <RepositoryUrl>https://github.com/massimilianokraus/MongoDB.DeepUpdater.CSharp</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <PackageTags>deepupdater mongodb nosql extension update</PackageTags>
-    <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
+    <PackageReleaseNotes>In version 1.1: 
+- Deferred execution (in 1.0 the execution was immediate) 
+- Refactoring 
+   - elimination of bad or repeated code 
+   - unification of the methods with particular parameters to the other methods</PackageReleaseNotes>
     <Version>1.1.0</Version>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
